@@ -7,6 +7,8 @@ import { fileURLToPath } from "url";
 import cors from "cors";
 import path from "path";
 import multer from "multer";
+import mongoose from "mongoose";
+import { register } from "./controllers/auth.controller.js";
 
 // CONFIGURATIONS
 const __filename = fileURLToPath(import.meta.url);
@@ -31,9 +33,24 @@ const storage = multer.diskStorage({
     cb(null, file.originalname);
   },
 });
-
 const upload = multer({ storage });
 
-app.listen(5000, () => {
-  console.log("Server is running");
-});
+// ROUTES
+
+app.use("/auth/register", upload.single("picture"), register);
+
+// DATABASE CONNNECTION
+const PORT = process.env.PORT || 6001;
+mongoose.set("strictQuery", true);
+mongoose
+  .connect(process.env.MONGO_URL, {
+    useNewURLParser: true,
+    useUnifiedTopology: true,
+    // strictQuery: true
+  })
+  .then(() => {
+    app.listen(PORT, () => console.log(`Server is running at ${PORT}`));
+  })
+  .catch((err) => {
+    console.log(`Server could not connect to the database`, err);
+  });
