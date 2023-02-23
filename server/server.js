@@ -20,6 +20,12 @@ const { createPost } = require("./controllers/posts.controller");
 // ROUTERS
 const { postsRouter, authRouter, usersRouter } = require("./routers");
 
+// Models
+const { Post, User } = require("./models");
+
+// Data for Migration
+const data = require("./data");
+
 // CONFIGURATIONS
 // const _filename = fileURLToPath(meta.url);
 // const _dirname = path.dirname(__filename);
@@ -65,6 +71,10 @@ mongoose
   })
   .then(() => {
     app.listen(PORT, () => console.log(`Server is running at ${PORT}`));
+
+    // Run only one time for data manual migration
+    // User.insertMany(data.users);
+    // Post.insertMany(data.posts);
   })
   .catch((err) => {
     console.log(`Server could not connect to the database`, err);

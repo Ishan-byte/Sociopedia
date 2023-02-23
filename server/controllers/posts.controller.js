@@ -13,7 +13,7 @@ const createPost = async (req, res) => {
       location: user.location,
       description,
       picturePath,
-      userPicturePath: user.pictureURL,
+      userPicturePath: user.picturePath,
       likes: [],
       comments: [],
     });
