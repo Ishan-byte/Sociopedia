@@ -1,8 +1,8 @@
-import User from "../models/User.model.js";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+const User = require("../models/User.model");
+const bcrypt = require("bcrypt");
 
-export const register = async (req, res) => {
+// REGISTER CONTROLLER
+const register = async (req, res) => {
   try {
     const {
       firstname,
@@ -38,3 +38,32 @@ export const register = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+// REGISTER CONTROLLER
+
+// LOGIN CONTROLLER
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email: email });
+
+    if (!user) return res.status(400).json({ error: "User does not exists" });
+
+    const comparePassword = await bcrypt.compare(password, user.password);
+
+    if (!comparePassword)
+      return res.status(400).json({ error: "Invalid Credentials" });
+
+    const token = jwt.sign({ id: user._id }, process.env.TOKEN_SECRET);
+
+    delete user.password;
+
+    res.status(200).json({ token, user });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// LOGIN CONTROLLER
+
+module.exports = { register, login };

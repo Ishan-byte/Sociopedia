@@ -1,18 +1,26 @@
-import express from "express";
-import dotenv from "dotenv";
-import helmet from "helmet";
-import morgan from "morgan";
-import bodyParser from "body-parser";
-import { fileURLToPath } from "url";
-import cors from "cors";
-import path from "path";
-import multer from "multer";
-import mongoose from "mongoose";
-import { register } from "./controllers/auth.controller.js";
+// Pre-built imports
+const express = require("express");
+const dotenv = require("dotenv");
+const helmet = require("helmet");
+const morgan = require("morgan");
+const bodyParser = require("body-parser");
+const { fileURLToPath } = require("url");
+const cors = require("cors");
+const path = require("path");
+const multer = require("multer");
+const mongoose = require("mongoose");
+
+// Controllers
+const { register } = require("./controllers/auth.controller");
+
+// ROUTERS
+const authRouter = require("./routers/auth.router");
+const usersRouter = require("./routers/users.router");
 
 // CONFIGURATIONS
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// const _filename = fileURLToPath(meta.url);
+// const _dirname = path.dirname(__filename);
+
 dotenv.config();
 const app = express();
 app.use(express.json());
@@ -36,17 +44,17 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // ROUTES
-
 app.use("/auth/register", upload.single("picture"), register);
+app.use("/auth", authRouter);
+app.use("/users", usersRouter);
 
 // DATABASE CONNNECTION
 const PORT = process.env.PORT || 6001;
-mongoose.set("strictQuery", true);
+mongoose.set("strictQuery", false);
 mongoose
   .connect(process.env.MONGO_URL, {
     useNewURLParser: true,
     useUnifiedTopology: true,
-    // strictQuery: true
   })
   .then(() => {
     app.listen(PORT, () => console.log(`Server is running at ${PORT}`));
