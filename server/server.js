@@ -10,12 +10,15 @@ const path = require("path");
 const multer = require("multer");
 const mongoose = require("mongoose");
 
+// Custom Middlware
+const verifyToken = require("./middlewares/verifyToken");
+
 // Controllers
 const { register } = require("./controllers/auth.controller");
+const { createPost } = require("./controllers/posts.controller");
 
 // ROUTERS
-const authRouter = require("./routers/auth.router");
-const usersRouter = require("./routers/users.router");
+const { postsRouter, authRouter, usersRouter } = require("./routers");
 
 // CONFIGURATIONS
 // const _filename = fileURLToPath(meta.url);
@@ -43,10 +46,14 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// ROUTES
+// ROUTES WITH FILE UPLOAD
 app.use("/auth/register", upload.single("picture"), register);
+app.use("/posts/create", verifyToken, upload.single("picture"), createPost);
+
+// ROUTES
 app.use("/auth", authRouter);
 app.use("/users", usersRouter);
+app.use("/posts", postsRouter);
 
 // DATABASE CONNNECTION
 const PORT = process.env.PORT || 6001;
