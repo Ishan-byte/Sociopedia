@@ -1,6 +1,12 @@
 import { useTheme } from "@emotion/react";
 import { EditOutlined } from "@mui/icons-material";
-import { Box,Button, TextField, Typography, useMediaQuery } from "@mui/material";
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  useMediaQuery,
+} from "@mui/material";
 import FlexBetween from "components/FlexBetween";
 import { Formik } from "formik";
 import React, { useState } from "react";
@@ -8,6 +14,7 @@ import Dropzone from "react-dropzone";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
+import { setLogin } from "state";
 
 const registerSchema = yup.object().shape({
   firstname: yup.string().required("First Name is required."),
@@ -55,18 +62,66 @@ const Form = () => {
 
   // FUNCTIONS
 
-    const register = async() => {} 
+  // For handling Register API call
+  const register = async (values, onSubmitProps) => {
 
-    const login = async() => {}    
-    
+    // Creation of form data for exporting form and multipart values
+    const formData = new FormData();
 
-    // For handling form submission
-    const handleFormSubmit = async (values, onSubmitProps) => {
-        if (isLogin) await login(values, onSubmitProps);
-        if (isRegister) await register(values, onSubmitProps);
-    };
+    //   values.forEach((val) => {
+    //         console.log(val) 
+    //       formData.append(val, values[val])
+    //   });
 
-    
+      for (let value in values) {
+        formData.append(value, values[value])
+    }    
+
+
+    formData.append("picturePath", values.picture.name);
+    console.log(formData)
+
+    const userData = await fetch("http://localhost:3001/auth/register", {
+      method: "POST",
+      body: formData,
+    });
+
+    const userDataResponse = await userData.json();
+
+    if (userDataResponse.error) {
+        window.alert(userDataResponse.error)
+    } else {
+     onSubmitProps.resetForm();
+        setPageType('login')
+    }
+  };
+
+  // For handling Login API call
+  const login = async (values, onSubmitProps) => {
+      
+    const loggedInResponse = await fetch("http://localhost:3001/auth/login", {
+      method: "POST",
+        headers: {
+          "Content-type": "application/json"
+      },
+      body: JSON.stringify(values),
+    });
+
+    const isLoggedIn = await loggedInResponse.json();
+
+    if (isLoggedIn.error) {
+        window.alert(isLoggedIn.error)
+    } else {
+      dispatch(setLogin(isLoggedIn));
+      navigate("/");
+    }
+  };
+
+  // For handling form submission
+  const handleFormSubmit = async (values, onSubmitProps) => {
+    if (isLogin) await login(values, onSubmitProps);
+    if (isRegister) await register(values, onSubmitProps);
+  };
 
   return (
     <Formik
@@ -195,6 +250,7 @@ const Form = () => {
             <TextField
               value={values.password}
               name="password"
+              type="password"
               label="Password"
               onChange={handleChange}
               onBlur={handleBlur}

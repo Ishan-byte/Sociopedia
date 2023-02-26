@@ -1,5 +1,6 @@
 const User = require("../models/User.model");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 // REGISTER CONTROLLER
 const register = async (req, res) => {
@@ -27,7 +28,7 @@ const register = async (req, res) => {
       friends,
       location,
       occupation,
-      viewProfile: Math.floor(Math.random() * 10000),
+      viewedProfile: Math.floor(Math.random() * 10000),
       impressions: Math.floor(Math.random() * 10000),
     });
 
@@ -44,8 +45,9 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-
+    console.log(email, password);
     const user = await User.findOne({ email: email });
+    console.log(user);
 
     if (!user) return res.status(400).json({ error: "User does not exists" });
 
