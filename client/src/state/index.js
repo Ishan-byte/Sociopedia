@@ -3,7 +3,10 @@ import { createSlice } from "@reduxjs/toolkit";
 // Initial Values for the Global State
 const initialState = {
   mode: "light",
-  user: null,
+  user: {
+    firstname: "Test",
+    lastname: "User",
+  },
   token: null,
   posts: [],
 };
@@ -14,7 +17,7 @@ export const authSlice = createSlice({
   reducers: {
     // Reducer for setting the lighting mode of the web UI
     setMode: (state) => {
-      state.mode = state.mode === "light" ? "dark " : "light";
+      state.mode = state.mode === "light" ? "dark" : "light";
     },
 
     // Reducer for setting the user information
@@ -56,6 +59,6 @@ export const authSlice = createSlice({
 });
 
 export const { setMode, setLogin, setLogOut, setFriends, setPosts, setPost } =
-    authSlice.actions;
+  authSlice.actions;
 
 export default authSlice.reducer;
