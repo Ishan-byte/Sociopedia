@@ -2,6 +2,7 @@ const User = require("../models/User.model");
 
 // Gets User
 const getUser = async (req, res) => {
+
   try {
     const userId = req.params.userId;
 
@@ -9,7 +10,7 @@ const getUser = async (req, res) => {
 
     if (!user) return res.status(400).json({ error: "User does not exists" });
 
-    delete user.password;
+    // delete user.password;
 
     res.status(200).json(user);
   } catch (error) {
